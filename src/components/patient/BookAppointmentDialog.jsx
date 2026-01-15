@@ -24,6 +24,7 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [reason, setReason] = useState("");
   const [booking, setBooking] = useState(false);
+  const [error, setError] = useState(null);
 
   const { data: doctors = [] } = useQuery({
     queryKey: ['doctors'],
@@ -88,6 +89,7 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
     if (!selectedDoctor || !selectedDate || !selectedSlot || !reason.trim()) return;
 
     setBooking(true);
+    setError(null);
     try {
       const appointment = await base44.entities.Appointment.create({
         patient_id: patientId,
@@ -112,10 +114,10 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
         message: `${patientName} has requested an appointment on ${format(selectedDate, 'MMM dd, yyyy')} at ${selectedSlot.start}`
       });
 
+      if (onSuccess) await onSuccess();
       resetAndClose();
-      if (onSuccess) onSuccess();
     } catch (error) {
-      console.error("Booking failed:", error);
+      setError(error.message || "Failed to book appointment. Please try again.");
       setBooking(false);
     }
   };
@@ -126,6 +128,8 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
     setSelectedDate(null);
     setSelectedSlot(null);
     setReason("");
+    setError(null);
+    setBooking(false);
     onClose();
   };
 
@@ -333,6 +337,12 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
                   className="resize-none"
                 />
               </div>
+
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {error}
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
