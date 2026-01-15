@@ -13,6 +13,15 @@ import DoctorAnalytics from "../components/doctor/DoctorAnalytics";
 export default function DoctorDashboard() {
   const [user, setUser] = useState(null);
   const [doctor, setDoctor] = useState(null);
+  const [activeTab, setActiveTab] = useState("requests");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, []);
 
   useEffect(() => {
     base44.auth.me().then(async (userData) => {
@@ -67,7 +76,7 @@ export default function DoctorDashboard() {
         />
 
         {/* Main Content */}
-        <Tabs defaultValue="requests" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:w-auto">
             <TabsTrigger value="requests">
               Requests ({pendingRequests.length})
