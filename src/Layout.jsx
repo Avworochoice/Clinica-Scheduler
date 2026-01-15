@@ -146,24 +146,24 @@ export default function Layout({ children, currentPageName }) {
                       <div className="font-medium">{user.full_name}</div>
                       <div className="text-xs text-slate-500 font-normal">{user.email}</div>
                     </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate(createPageUrl('Profile'))}>
                     <UserIcon className="w-4 h-4 mr-2" />
                     Profile
                     <Badge variant="secondary" className="ml-auto text-xs">
                       {user.role}
                     </Badge>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate(createPageUrl('Settings'))}>
                     <Settings className="w-4 h-4 mr-2" />
                     Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign out
-                  </DropdownMenuItem>
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
