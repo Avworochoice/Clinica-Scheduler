@@ -3,6 +3,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 export const PAGES = {
@@ -11,6 +12,7 @@ export const PAGES = {
     "ForgotPassword": ForgotPassword,
     "PatientDashboard": PatientDashboard,
     "DoctorDashboard": DoctorDashboard,
+    "AdminDashboard": AdminDashboard,
 }
 
 export const pagesConfig = {
