@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 
-export default function UserManagement({ users }) {
+export default function UserManagement({ users, refetchUsers }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("user");
@@ -47,6 +47,7 @@ export default function UserManagement({ users }) {
     setInviting(true);
     try {
       await base44.users.inviteUser(inviteEmail, inviteRole);
+      if (refetchUsers) refetchUsers();
       setShowInvite(false);
       setInviteEmail("");
       setInviteRole("user");
@@ -62,6 +63,7 @@ export default function UserManagement({ users }) {
       await base44.entities.User.update(userId, {
         is_active: !currentStatus
       });
+      if (refetchUsers) refetchUsers();
     } catch (error) {
       console.error("Failed to update user status:", error);
     }
@@ -70,6 +72,7 @@ export default function UserManagement({ users }) {
   const handleDelete = async (userId) => {
     try {
       await base44.entities.User.delete(userId);
+      if (refetchUsers) refetchUsers();
       setDeleteConfirm(null);
     } catch (error) {
       console.error("Failed to delete user:", error);

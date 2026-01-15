@@ -23,23 +23,38 @@ export default function AdminDashboard() {
     }).catch(() => base44.auth.redirectToLogin());
   }, []);
 
-  const { data: users = [] } = useQuery({
+  const { data: users = [], refetch: refetchUsers } = useQuery({
     queryKey: ['all-users'],
-    queryFn: () => base44.entities.User.list('-created_date'),
+    queryFn: async () => {
+      const data = await base44.entities.User.list('-created_date');
+      // Deduplicate by id
+      const uniqueUsers = Array.from(new Map(data.map(item => [item.id, item])).values());
+      return uniqueUsers;
+    },
     enabled: !!user,
     initialData: []
   });
 
   const { data: doctors = [], refetch: refetchDoctors } = useQuery({
     queryKey: ['all-doctors'],
-    queryFn: () => base44.entities.Doctor.list('-created_date'),
+    queryFn: async () => {
+      const data = await base44.entities.Doctor.list('-created_date');
+      // Deduplicate by id
+      const uniqueDoctors = Array.from(new Map(data.map(item => [item.id, item])).values());
+      return uniqueDoctors;
+    },
     enabled: !!user,
     initialData: []
   });
 
   const { data: appointments = [], refetch: refetchAppointments } = useQuery({
     queryKey: ['all-appointments'],
-    queryFn: () => base44.entities.Appointment.list('-created_date'),
+    queryFn: async () => {
+      const data = await base44.entities.Appointment.list('-created_date');
+      // Deduplicate by id
+      const uniqueAppointments = Array.from(new Map(data.map(item => [item.id, item])).values());
+      return uniqueAppointments;
+    },
     enabled: !!user,
     initialData: []
   });
@@ -106,7 +121,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="users">
-            <UserManagement users={users} />
+            <UserManagement users={users} refetchUsers={refetchUsers} />
           </TabsContent>
 
           <TabsContent value="doctors">
