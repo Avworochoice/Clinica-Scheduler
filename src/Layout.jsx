@@ -118,24 +118,6 @@ export default function Layout({ children, currentPageName }) {
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-2">
-              {navigation.map((item) => {
-                const isActive = currentPageName === item.page;
-                return (
-                  <Link key={item.name} to={createPageUrl(item.page)}>
-                    <Button
-                      variant={isActive ? "default" : "ghost"}
-                      className={isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500" : ""}
-                    >
-                      <item.icon className="w-4 h-4 mr-2" />
-                      {item.name}
-                    </Button>
-                  </Link>
-                );
-              })}
-            </div>
-
             {/* User Menu */}
             <div className="flex items-center gap-3">
               <DropdownMenu>
@@ -216,8 +198,33 @@ export default function Layout({ children, currentPageName }) {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <main>{children}</main>
+      {/* Main Layout with Sidebar */}
+      <div className="flex">
+        {/* Desktop Sidebar Navigation */}
+        <aside className="hidden md:block w-64 bg-white border-r border-slate-200 min-h-screen sticky top-16">
+          <nav className="p-4 space-y-2">
+            {navigation.map((item) => {
+              const isActive = currentPageName === item.page;
+              return (
+                <Link key={item.name} to={createPageUrl(item.page)}>
+                  <Button
+                    variant={isActive ? "default" : "ghost"}
+                    className={`w-full justify-start ${
+                      isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500" : ""
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5 mr-3" />
+                    {item.name}
+                  </Button>
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1">{children}</main>
+      </div>
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 mt-12">
