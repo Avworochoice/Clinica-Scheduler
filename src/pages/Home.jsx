@@ -11,6 +11,23 @@ export default function Home() {
   const words = ["Efficient", "Secure", "Modern", "Smart"];
 
   useEffect(() => {
+    // Check if user is authenticated and redirect to appropriate dashboard
+    base44.auth.isAuthenticated().then(isAuth => {
+      if (isAuth) {
+        base44.auth.me().then(user => {
+          if (user.role === 'admin') {
+            window.location.href = createPageUrl('AdminDashboard');
+          } else if (user.doctor_id) {
+            window.location.href = createPageUrl('DoctorDashboard');
+          } else {
+            window.location.href = createPageUrl('PatientDashboard');
+          }
+        }).catch(() => {});
+      }
+    });
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWord((prev) => (prev + 1) % words.length);
     }, 2500);
