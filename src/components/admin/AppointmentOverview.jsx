@@ -4,7 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Search, User, Clock, Plus } from "lucide-react";
+import { Calendar, Search, User, Clock, Plus, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -26,6 +36,7 @@ export default function AppointmentOverview({ appointments, doctors, refetchAppo
     status: "pending",
     reason: ""
   });
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const statusColors = {
     pending: "bg-yellow-100 text-yellow-800",
@@ -93,6 +104,17 @@ export default function AppointmentOverview({ appointments, doctors, refetchAppo
       reason: ""
     });
     setShowAddAppointment(false);
+  };
+
+  const handleDelete = async (appointmentId) => {
+    try {
+      await base44.entities.Appointment.delete(appointmentId);
+      refetchAppointments();
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error("Failed to delete appointment:", error);
+      alert("Failed to delete appointment: " + (error.message || "Unknown error"));
+    }
   };
 
   return (
@@ -250,6 +272,7 @@ export default function AppointmentOverview({ appointments, doctors, refetchAppo
                 <TableHead>Status</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -292,12 +315,42 @@ export default function AppointmentOverview({ appointments, doctors, refetchAppo
                   <TableCell className="text-slate-600 text-sm">
                     {apt.created_date ? format(new Date(apt.created_date), 'MMM dd, yyyy') : 'N/A'}
                   </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDeleteConfirm(apt)}
+                      className="border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </div>
       </CardContent>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Appointment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this appointment for {deleteConfirm?.patient_name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleDelete(deleteConfirm.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

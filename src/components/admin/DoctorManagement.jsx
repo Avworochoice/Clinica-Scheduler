@@ -7,7 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { UserPlus, Search, Activity, Mail, Phone, Edit, Plus, X } from "lucide-react";
+import { UserPlus, Search, Activity, Mail, Phone, Edit, Plus, X, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -33,6 +43,7 @@ export default function DoctorManagement({ doctors, refetchDoctors }) {
     availability: []
   });
   const [availabilitySlot, setAvailabilitySlot] = useState({ day: "Monday", start_time: "09:00", end_time: "17:00" });
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const filteredDoctors = doctors.filter(doc =>
     doc.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -110,6 +121,17 @@ export default function DoctorManagement({ doctors, refetchDoctors }) {
     });
     setEditing(doctor);
     setShowAdd(true);
+  };
+
+  const handleDelete = async (doctorId) => {
+    try {
+      await base44.entities.Doctor.delete(doctorId);
+      refetchDoctors();
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error("Failed to delete doctor:", error);
+      alert("Failed to delete doctor: " + (error.message || "Unknown error"));
+    }
   };
 
   return (
@@ -311,21 +333,52 @@ export default function DoctorManagement({ doctors, refetchDoctors }) {
                     {doctor.availability?.length || 0} availability slots
                   </div>
 
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEdit(doctor)}
-                    className="w-full"
-                  >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit Details
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleEdit(doctor)}
+                      className="flex-1"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setDeleteConfirm(doctor)}
+                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Delete
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
       </CardContent>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Doctor</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete Dr. {deleteConfirm?.name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleDelete(deleteConfirm.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

@@ -6,7 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserPlus, Search, Mail, Shield, User, Ban, CheckCircle } from "lucide-react";
+import { UserPlus, Search, Mail, Shield, User, Ban, CheckCircle, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
 import {
   Dialog,
@@ -24,6 +34,7 @@ export default function UserManagement({ users }) {
   const [inviteRole, setInviteRole] = useState("user");
   const [inviting, setInviting] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   const filteredUsers = users.filter(user =>
     user.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -53,6 +64,16 @@ export default function UserManagement({ users }) {
       });
     } catch (error) {
       console.error("Failed to update user status:", error);
+    }
+  };
+
+  const handleDelete = async (userId) => {
+    try {
+      await base44.entities.User.delete(userId);
+      setDeleteConfirm(null);
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      alert("Failed to delete user: " + (error.message || "Unknown error"));
     }
   };
 
@@ -190,28 +211,38 @@ export default function UserManagement({ users }) {
                     {user.created_date ? format(new Date(user.created_date), 'MMM dd, yyyy') : 'N/A'}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleToggleStatus(user.id, user.is_active !== false)}
-                      className={
-                        user.is_active !== false
-                          ? 'border-red-200 text-red-600 hover:bg-red-50'
-                          : 'border-green-200 text-green-600 hover:bg-green-50'
-                      }
-                    >
-                      {user.is_active !== false ? (
-                        <>
-                          <Ban className="w-4 h-4 mr-1" />
-                          Deactivate
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Activate
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleToggleStatus(user.id, user.is_active !== false)}
+                        className={
+                          user.is_active !== false
+                            ? 'border-red-200 text-red-600 hover:bg-red-50'
+                            : 'border-green-200 text-green-600 hover:bg-green-50'
+                        }
+                      >
+                        {user.is_active !== false ? (
+                          <>
+                            <Ban className="w-4 h-4 mr-1" />
+                            Deactivate
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Activate
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setDeleteConfirm(user)}
+                        className="border-red-200 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -219,6 +250,26 @@ export default function UserManagement({ users }) {
           </Table>
         </div>
       </CardContent>
+
+      <AlertDialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {deleteConfirm?.full_name || deleteConfirm?.email}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleDelete(deleteConfirm.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }
