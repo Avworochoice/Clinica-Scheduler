@@ -13,6 +13,7 @@ import AuditLogs from "../components/admin/AuditLogs";
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState("appointments");
 
   useEffect(() => {
     base44.auth.me().then((userData) => {
@@ -21,6 +22,14 @@ export default function AdminDashboard() {
       }
       setUser(userData);
     }).catch(() => base44.auth.redirectToLogin());
+  }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
   }, []);
 
   const { data: users = [], refetch: refetchUsers } = useQuery({
@@ -92,7 +101,7 @@ export default function AdminDashboard() {
         />
 
         {/* Main Content */}
-        <Tabs defaultValue="appointments" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 lg:w-auto">
             <TabsTrigger value="appointments">
               <Calendar className="w-4 h-4 mr-2" />

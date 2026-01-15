@@ -76,18 +76,18 @@ export default function Layout({ children, currentPageName }) {
   const getNavigation = () => {
     if (user.role === 'admin') {
       return [
-        { name: 'Dashboard', page: 'AdminDashboard', icon: Shield },
-        { name: 'Appointments', page: 'AdminDashboard', icon: Calendar },
-        { name: 'Users', page: 'AdminDashboard', icon: Users },
-        { name: 'Doctors', page: 'AdminDashboard', icon: Activity },
-        { name: 'Analytics', page: 'AdminDashboard', icon: BarChart3 }
+        { name: 'Dashboard', page: 'AdminDashboard', icon: Shield, tab: 'appointments' },
+        { name: 'Appointments', page: 'AdminDashboard', icon: Calendar, tab: 'appointments' },
+        { name: 'Users', page: 'AdminDashboard', icon: Users, tab: 'users' },
+        { name: 'Doctors', page: 'AdminDashboard', icon: Activity, tab: 'doctors' },
+        { name: 'Analytics', page: 'AdminDashboard', icon: BarChart3, tab: 'analytics' }
       ];
     } else if (user.doctor_id) {
       return [
-        { name: 'Dashboard', page: 'DoctorDashboard', icon: Home },
-        { name: 'Requests', page: 'DoctorDashboard', icon: Bell },
-        { name: 'Schedule', page: 'DoctorDashboard', icon: Calendar },
-        { name: 'Analytics', page: 'DoctorDashboard', icon: BarChart3 }
+        { name: 'Dashboard', page: 'DoctorDashboard', icon: Home, tab: 'overview' },
+        { name: 'Requests', page: 'DoctorDashboard', icon: Bell, tab: 'requests' },
+        { name: 'Schedule', page: 'DoctorDashboard', icon: Calendar, tab: 'schedule' },
+        { name: 'Analytics', page: 'DoctorDashboard', icon: BarChart3, tab: 'analytics' }
       ];
     } else {
       return [
@@ -101,10 +101,10 @@ export default function Layout({ children, currentPageName }) {
   const navigation = getNavigation();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 overflow-x-hidden">
       {/* Top Navigation Bar */}
       <nav className="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-full lg:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
             <Link to={createPageUrl(navigation[0].page)} className="flex items-center gap-3">
@@ -175,10 +175,11 @@ export default function Layout({ children, currentPageName }) {
             <div className="md:hidden py-4 space-y-2 border-t border-slate-200">
               {navigation.map((item) => {
                 const isActive = currentPageName === item.page;
+                const url = item.tab ? `${createPageUrl(item.page)}?tab=${item.tab}` : createPageUrl(item.page);
                 return (
                   <Link
                     key={item.name}
-                    to={createPageUrl(item.page)}
+                    to={url}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     <Button
@@ -205,8 +206,9 @@ export default function Layout({ children, currentPageName }) {
           <nav className="p-4 space-y-2">
             {navigation.map((item) => {
               const isActive = currentPageName === item.page;
+              const url = item.tab ? `${createPageUrl(item.page)}?tab=${item.tab}` : createPageUrl(item.page);
               return (
-                <Link key={item.name} to={createPageUrl(item.page)}>
+                <Link key={item.name} to={url}>
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     className={`w-full justify-start ${
