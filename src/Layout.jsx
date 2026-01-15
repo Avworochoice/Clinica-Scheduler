@@ -16,16 +16,16 @@ import {
   X,
   Shield,
   User as UserIcon,
-  Clock
-} from "lucide-react";
+  Clock } from
+"lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenuTrigger } from
+"@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
 export default function Layout({ children, currentPageName }) {
@@ -37,7 +37,7 @@ export default function Layout({ children, currentPageName }) {
   const [currentTab, setCurrentTab] = useState("");
 
   useEffect(() => {
-    base44.auth.isAuthenticated().then(isAuth => {
+    base44.auth.isAuthenticated().then((isAuth) => {
       if (isAuth) {
         base44.auth.me().then(setUser).catch(() => {});
       }
@@ -60,7 +60,7 @@ export default function Layout({ children, currentPageName }) {
         action: "user_logout"
       });
     } catch (error) {}
-    
+
     base44.auth.logout();
   };
 
@@ -84,26 +84,26 @@ export default function Layout({ children, currentPageName }) {
   const getNavigation = () => {
     if (user.role === 'admin') {
       return [
-        { name: 'Dashboard', page: 'AdminDashboard', icon: Shield, tab: 'appointments' },
-        { name: 'Appointments', page: 'AdminDashboard', icon: Calendar, tab: 'appointments' },
-        { name: 'Users', page: 'AdminDashboard', icon: Users, tab: 'users' },
-        { name: 'Doctors', page: 'AdminDashboard', icon: Activity, tab: 'doctors' },
-        { name: 'Analytics', page: 'AdminDashboard', icon: BarChart3, tab: 'analytics' }
-      ];
+      { name: 'Dashboard', page: 'AdminDashboard', icon: Shield, tab: 'appointments' },
+      { name: 'Appointments', page: 'AdminDashboard', icon: Calendar, tab: 'appointments' },
+      { name: 'Users', page: 'AdminDashboard', icon: Users, tab: 'users' },
+      { name: 'Doctors', page: 'AdminDashboard', icon: Activity, tab: 'doctors' },
+      { name: 'Analytics', page: 'AdminDashboard', icon: BarChart3, tab: 'analytics' }];
+
     } else if (user.doctor_id) {
       return [
-        { name: 'Dashboard', page: 'DoctorDashboard', icon: Home, tab: 'overview' },
-        { name: 'Requests', page: 'DoctorDashboard', icon: Bell, tab: 'requests' },
-        { name: 'Schedule', page: 'DoctorDashboard', icon: Calendar, tab: 'schedule' },
-        { name: 'Analytics', page: 'DoctorDashboard', icon: BarChart3, tab: 'analytics' }
-      ];
+      { name: 'Dashboard', page: 'DoctorDashboard', icon: Home, tab: 'overview' },
+      { name: 'Requests', page: 'DoctorDashboard', icon: Bell, tab: 'requests' },
+      { name: 'Schedule', page: 'DoctorDashboard', icon: Calendar, tab: 'schedule' },
+      { name: 'Analytics', page: 'DoctorDashboard', icon: BarChart3, tab: 'analytics' }];
+
     } else {
       return [
-        { name: 'Dashboard', page: 'PatientDashboard', icon: Home, tab: 'upcoming' },
-        { name: 'Upcoming', page: 'PatientDashboard', icon: Calendar, tab: 'upcoming' },
-        { name: 'Pending', page: 'PatientDashboard', icon: Clock, tab: 'pending' },
-        { name: 'Past', page: 'PatientDashboard', icon: Activity, tab: 'past' }
-      ];
+      { name: 'Dashboard', page: 'PatientDashboard', icon: Home, tab: 'upcoming' },
+      { name: 'Upcoming', page: 'PatientDashboard', icon: Calendar, tab: 'upcoming' },
+      { name: 'Pending', page: 'PatientDashboard', icon: Clock, tab: 'pending' },
+      { name: 'Past', page: 'PatientDashboard', icon: Activity, tab: 'past' }];
+
     }
   };
 
@@ -172,41 +172,41 @@ export default function Layout({ children, currentPageName }) {
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </Button>
             </div>
           </div>
 
           {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div className="md:hidden py-4 space-y-2 border-t border-slate-200">
+          {mobileMenuOpen &&
+          <div className="md:hidden py-4 space-y-2 border-t border-slate-200">
               {navigation.map((item) => {
-                const isCurrentPage = currentPageName === item.page;
-                const isCurrentTab = item.tab ? currentTab === item.tab : true;
-                const isActive = isCurrentPage && isCurrentTab;
-                const url = item.tab ? `${createPageUrl(item.page)}?tab=${item.tab}` : createPageUrl(item.page);
-                return (
-                  <Link
-                    key={item.name}
-                    to={url}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+              const isCurrentPage = currentPageName === item.page;
+              const isCurrentTab = item.tab ? currentTab === item.tab : true;
+              const isActive = isCurrentPage && isCurrentTab;
+              const url = item.tab ? `${createPageUrl(item.page)}?tab=${item.tab}` : createPageUrl(item.page);
+              return (
+                <Link
+                  key={item.name}
+                  to={url}
+                  onClick={() => setMobileMenuOpen(false)}>
+
                     <Button
-                      variant={isActive ? "default" : "ghost"}
-                      className={`w-full justify-start ${
-                        isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500" : ""
-                      }`}
-                    >
+                    variant={isActive ? "default" : "ghost"}
+                    className={`w-full justify-start ${
+                    isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500" : ""}`
+                    }>
+
                       <item.icon className="w-4 h-4 mr-2" />
                       {item.name}
                     </Button>
-                  </Link>
-                );
-              })}
+                  </Link>);
+
+            })}
             </div>
-          )}
+          }
         </div>
       </nav>
 
@@ -225,14 +225,14 @@ export default function Layout({ children, currentPageName }) {
                   <Button
                     variant={isActive ? "default" : "ghost"}
                     className={`w-full justify-start ${
-                      isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500" : ""
-                    }`}
-                  >
+                    isActive ? "bg-gradient-to-r from-blue-600 to-cyan-500" : ""}`
+                    }>
+
                     <item.icon className="w-5 h-5 mr-3" />
                     {item.name}
                   </Button>
-                </Link>
-              );
+                </Link>);
+
             })}
           </nav>
         </aside>
@@ -249,8 +249,8 @@ export default function Layout({ children, currentPageName }) {
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
-              <span className="text-sm text-slate-600">
-                © 2024 Clinica Scheduler. All rights reserved.
+              <span className="text-sm text-slate-600">© 2026 Clinica Scheduler. All rights reserved.
+
               </span>
             </div>
             <div className="flex gap-6 text-sm text-slate-600">
@@ -261,6 +261,6 @@ export default function Layout({ children, currentPageName }) {
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>);
+
 }
