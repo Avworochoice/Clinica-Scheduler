@@ -111,17 +111,22 @@ export default function Home() {
               transition={{ delay: 0.5 }}
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
-              <Link to={createPageUrl("Register")}>
-                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-8 h-14 text-lg group">
-                  Get Started
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to={createPageUrl("Login")}>
-                <Button size="lg" variant="outline" className="border-2 border-slate-300 hover:bg-slate-100 h-14 px-8 text-lg">
-                  Sign In
-                </Button>
-              </Link>
+              <Button 
+                size="lg" 
+                onClick={() => window.location.href = '/auth/register'}
+                className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-8 h-14 text-lg group"
+              >
+                Get Started
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                onClick={() => window.location.href = '/auth/login'}
+                className="border-2 border-slate-300 hover:bg-slate-100 h-14 px-8 text-lg"
+              >
+                Sign In
+              </Button>
             </motion.div>
 
             <motion.div
@@ -319,11 +324,13 @@ export default function Home() {
           <p className="text-xl text-slate-300 mb-8">
             Join thousands of healthcare professionals using Clinica Scheduler
           </p>
-          <Link to={createPageUrl("Register")}>
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-12 h-14 text-lg">
-              Start Free Trial
-            </Button>
-          </Link>
+          <Button 
+            size="lg" 
+            onClick={() => window.location.href = '/auth/register'}
+            className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-12 h-14 text-lg"
+          >
+            Start Free Trial
+          </Button>
         </motion.div>
       </section>
     </div>
