@@ -30,14 +30,14 @@ export default function AdminDashboard() {
     initialData: []
   });
 
-  const { data: doctors = [] } = useQuery({
+  const { data: doctors = [], refetch: refetchDoctors } = useQuery({
     queryKey: ['all-doctors'],
     queryFn: () => base44.entities.Doctor.list('-created_date'),
     enabled: !!user,
     initialData: []
   });
 
-  const { data: appointments = [] } = useQuery({
+  const { data: appointments = [], refetch: refetchAppointments } = useQuery({
     queryKey: ['all-appointments'],
     queryFn: () => base44.entities.Appointment.list('-created_date'),
     enabled: !!user,
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="appointments">
-            <AppointmentOverview appointments={appointments} doctors={doctors} />
+            <AppointmentOverview appointments={appointments} doctors={doctors} refetchAppointments={refetchAppointments} />
           </TabsContent>
 
           <TabsContent value="users">
@@ -110,7 +110,7 @@ export default function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="doctors">
-            <DoctorManagement doctors={doctors} />
+            <DoctorManagement doctors={doctors} refetchDoctors={refetchDoctors} />
           </TabsContent>
 
           <TabsContent value="analytics">

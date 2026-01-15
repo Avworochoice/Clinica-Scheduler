@@ -4,12 +4,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Calendar, Search, User, Clock } from "lucide-react";
+import { Calendar, Search, User, Clock, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { base44 } from "@/api/base44Client";
 
-export default function AppointmentOverview({ appointments, doctors }) {
+export default function AppointmentOverview({ appointments, doctors, refetchAppointments }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [showAddAppointment, setShowAddAppointment] = useState(false);
+  const [newAppointmentData, setNewAppointmentData] = useState({
+    patient_name: "",
+    patient_email: "",
+    doctor_id: "",
+    date: "",
+    start_time: "",
+    end_time: "",
+    status: "pending",
+    reason: ""
+  });
 
   const statusColors = {
     pending: "bg-yellow-100 text-yellow-800",
@@ -26,6 +42,58 @@ export default function AppointmentOverview({ appointments, doctors }) {
     const matchesStatus = statusFilter === "all" || apt.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  const handleAddAppointment = async () => {
+    try {
+      if (!newAppointmentData.patient_name || !newAppointmentData.patient_email || !newAppointmentData.doctor_id || !newAppointmentData.date || !newAppointmentData.start_time || !newAppointmentData.end_time || !newAppointmentData.reason) {
+        alert("Please fill all required fields.");
+        return;
+      }
+
+      const selectedDoctor = doctors.find(doc => doc.id === newAppointmentData.doctor_id);
+      if (!selectedDoctor) {
+        alert("Selected doctor not found.");
+        return;
+      }
+
+      // Find user by email to get patient_id
+      const users = await base44.entities.User.filter({ email: newAppointmentData.patient_email });
+      const patientId = users && users.length > 0 ? users[0].id : "admin-created-patient";
+
+      await base44.entities.Appointment.create({
+        patient_id: patientId,
+        patient_name: newAppointmentData.patient_name,
+        patient_email: newAppointmentData.patient_email,
+        doctor_id: newAppointmentData.doctor_id,
+        doctor_name: selectedDoctor.name,
+        date: newAppointmentData.date,
+        start_time: newAppointmentData.start_time,
+        end_time: newAppointmentData.end_time,
+        status: newAppointmentData.status,
+        reason: newAppointmentData.reason
+      });
+
+      refetchAppointments();
+      resetAddAppointmentForm();
+    } catch (error) {
+      console.error("Failed to add appointment:", error);
+      alert("Failed to add appointment: " + (error.message || "Unknown error"));
+    }
+  };
+
+  const resetAddAppointmentForm = () => {
+    setNewAppointmentData({
+      patient_name: "",
+      patient_email: "",
+      doctor_id: "",
+      date: "",
+      start_time: "",
+      end_time: "",
+      status: "pending",
+      reason: ""
+    });
+    setShowAddAppointment(false);
+  };
 
   return (
     <Card className="shadow-lg border-0">
@@ -58,6 +126,116 @@ export default function AppointmentOverview({ appointments, doctors }) {
                 <SelectItem value="completed">Completed</SelectItem>
               </SelectContent>
             </Select>
+            <Dialog open={showAddAppointment} onOpenChange={setShowAddAppointment}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-cyan-500">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Appointment
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Add New Appointment</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Patient Name *</Label>
+                      <Input
+                        value={newAppointmentData.patient_name}
+                        onChange={(e) => setNewAppointmentData({ ...newAppointmentData, patient_name: e.target.value })}
+                        placeholder="Patient Full Name"
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label>Patient Email *</Label>
+                      <Input
+                        type="email"
+                        value={newAppointmentData.patient_email}
+                        onChange={(e) => setNewAppointmentData({ ...newAppointmentData, patient_email: e.target.value })}
+                        placeholder="patient@example.com"
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Doctor *</Label>
+                    <Select value={newAppointmentData.doctor_id} onValueChange={(val) => setNewAppointmentData({ ...newAppointmentData, doctor_id: val })}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select Doctor" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {doctors.map(doc => (
+                          <SelectItem key={doc.id} value={doc.id}>Dr. {doc.name} ({doc.specialty})</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label>Date *</Label>
+                      <Input
+                        type="date"
+                        value={newAppointmentData.date}
+                        onChange={(e) => setNewAppointmentData({ ...newAppointmentData, date: e.target.value })}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label>Start Time *</Label>
+                      <Input
+                        type="time"
+                        value={newAppointmentData.start_time}
+                        onChange={(e) => setNewAppointmentData({ ...newAppointmentData, start_time: e.target.value })}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label>End Time *</Label>
+                      <Input
+                        type="time"
+                        value={newAppointmentData.end_time}
+                        onChange={(e) => setNewAppointmentData({ ...newAppointmentData, end_time: e.target.value })}
+                        className="mt-2"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Reason *</Label>
+                    <Textarea
+                      value={newAppointmentData.reason}
+                      onChange={(e) => setNewAppointmentData({ ...newAppointmentData, reason: e.target.value })}
+                      placeholder="Reason for appointment..."
+                      rows={3}
+                      className="mt-2"
+                    />
+                  </div>
+                  <div>
+                    <Label>Status</Label>
+                    <Select value={newAppointmentData.status} onValueChange={(val) => setNewAppointmentData({ ...newAppointmentData, status: val })}>
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="approved">Approved</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                        <SelectItem value="completed">Completed</SelectItem>
+                        <SelectItem value="no_show">No Show</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="flex justify-end gap-3">
+                  <Button variant="outline" onClick={resetAddAppointmentForm}>Cancel</Button>
+                  <Button onClick={handleAddAppointment}>
+                    Add Appointment
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </CardHeader>

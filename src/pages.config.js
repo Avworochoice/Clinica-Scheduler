@@ -1,15 +1,15 @@
+import AdminDashboard from './pages/AdminDashboard';
+import DoctorDashboard from './pages/DoctorDashboard';
 import Home from './pages/Home';
 import PatientDashboard from './pages/PatientDashboard';
-import DoctorDashboard from './pages/DoctorDashboard';
-import AdminDashboard from './pages/AdminDashboard';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "AdminDashboard": AdminDashboard,
+    "DoctorDashboard": DoctorDashboard,
     "Home": Home,
     "PatientDashboard": PatientDashboard,
-    "DoctorDashboard": DoctorDashboard,
-    "AdminDashboard": AdminDashboard,
 }
 
 export const pagesConfig = {

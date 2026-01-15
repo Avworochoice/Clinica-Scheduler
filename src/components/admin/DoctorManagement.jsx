@@ -19,7 +19,7 @@ const SPECIALTIES = [
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-export default function DoctorManagement({ doctors }) {
+export default function DoctorManagement({ doctors, refetchDoctors }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -42,14 +42,30 @@ export default function DoctorManagement({ doctors }) {
 
   const handleSubmit = async () => {
     try {
-      if (editing) {
-        await base44.entities.Doctor.update(editing.id, formData);
-      } else {
-        await base44.entities.Doctor.create(formData);
+      // Find user by email to get user_id
+      let doctorUserId = null;
+      if (formData.email) {
+        const users = await base44.entities.User.filter({ email: formData.email });
+        if (users && users.length > 0) {
+          doctorUserId = users[0].id;
+        } else {
+          alert("No user found with this email. Please ensure the doctor is registered as a user first.");
+          return;
+        }
       }
+
+      const dataToSave = { ...formData, user_id: doctorUserId };
+
+      if (editing) {
+        await base44.entities.Doctor.update(editing.id, dataToSave);
+      } else {
+        await base44.entities.Doctor.create(dataToSave);
+      }
+      refetchDoctors();
       resetForm();
     } catch (error) {
       console.error("Failed to save doctor:", error);
+      alert("Failed to save doctor: " + (error.message || "Unknown error"));
     }
   };
 
@@ -114,7 +130,7 @@ export default function DoctorManagement({ doctors }) {
                 className="pl-10"
               />
             </div>
-            <Dialog open={showAdd} onOpenChange={setShowAdd}>
+            <Dialog open={showAdd} onOpenChange={(open) => { if (!open) resetForm(); setShowAdd(open); }}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-green-600 to-emerald-500">
                   <UserPlus className="w-4 h-4 mr-2" />
