@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,8 @@ export default function Layout({ children, currentPageName }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [currentTab, setCurrentTab] = useState("");
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(isAuth => {
@@ -42,6 +44,11 @@ export default function Layout({ children, currentPageName }) {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    setCurrentTab(urlParams.get('tab') || "");
+  }, [location.search]);
 
   const handleLogout = async () => {
     try {
@@ -176,7 +183,9 @@ export default function Layout({ children, currentPageName }) {
           {mobileMenuOpen && (
             <div className="md:hidden py-4 space-y-2 border-t border-slate-200">
               {navigation.map((item) => {
-                const isActive = currentPageName === item.page;
+                const isCurrentPage = currentPageName === item.page;
+                const isCurrentTab = item.tab ? currentTab === item.tab : true;
+                const isActive = isCurrentPage && isCurrentTab;
                 const url = item.tab ? `${createPageUrl(item.page)}?tab=${item.tab}` : createPageUrl(item.page);
                 return (
                   <Link
@@ -207,7 +216,9 @@ export default function Layout({ children, currentPageName }) {
         <aside className="hidden md:block w-64 bg-white border-r border-slate-200 min-h-screen sticky top-16">
           <nav className="p-4 space-y-2">
             {navigation.map((item) => {
-              const isActive = currentPageName === item.page;
+              const isCurrentPage = currentPageName === item.page;
+              const isCurrentTab = item.tab ? currentTab === item.tab : true;
+              const isActive = isCurrentPage && isCurrentTab;
               const url = item.tab ? `${createPageUrl(item.page)}?tab=${item.tab}` : createPageUrl(item.page);
               return (
                 <Link key={item.name} to={url}>

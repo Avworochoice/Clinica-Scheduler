@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -15,14 +16,15 @@ export default function PatientDashboard() {
   const [user, setUser] = useState(null);
   const [showBooking, setShowBooking] = useState(false);
   const [activeTab, setActiveTab] = useState("upcoming");
+  const location = useLocation();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(location.search);
     const tab = urlParams.get('tab');
     if (tab) {
       setActiveTab(tab);
     }
-  }, [window.location.search]);
+  }, [location.search]);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => base44.auth.redirectToLogin());

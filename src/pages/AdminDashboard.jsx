@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -14,6 +15,7 @@ import AuditLogs from "../components/admin/AuditLogs";
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState("appointments");
+  const location = useLocation();
 
   useEffect(() => {
     base44.auth.me().then((userData) => {
@@ -25,12 +27,12 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(location.search);
     const tab = urlParams.get('tab');
     if (tab) {
       setActiveTab(tab);
     }
-  }, [window.location.search]);
+  }, [location.search]);
 
   const { data: users = [], refetch: refetchUsers } = useQuery({
     queryKey: ['all-users'],
