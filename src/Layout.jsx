@@ -15,7 +15,8 @@ import {
   Menu,
   X,
   Shield,
-  User as UserIcon
+  User as UserIcon,
+  Clock
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -91,9 +92,10 @@ export default function Layout({ children, currentPageName }) {
       ];
     } else {
       return [
-        { name: 'Dashboard', page: 'PatientDashboard', icon: Home },
-        { name: 'Book Appointment', page: 'PatientDashboard', icon: Calendar },
-        { name: 'My Appointments', page: 'PatientDashboard', icon: Activity }
+        { name: 'Dashboard', page: 'PatientDashboard', icon: Home, tab: 'upcoming' },
+        { name: 'Upcoming', page: 'PatientDashboard', icon: Calendar, tab: 'upcoming' },
+        { name: 'Pending', page: 'PatientDashboard', icon: Clock, tab: 'pending' },
+        { name: 'Past', page: 'PatientDashboard', icon: Activity, tab: 'past' }
       ];
     }
   };

@@ -14,6 +14,15 @@ import NotificationsList from "../components/shared/NotificationsList";
 export default function PatientDashboard() {
   const [user, setUser] = useState(null);
   const [showBooking, setShowBooking] = useState(false);
+  const [activeTab, setActiveTab] = useState("upcoming");
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, []);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => base44.auth.redirectToLogin());
@@ -50,8 +59,8 @@ export default function PatientDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 p-4 md:p-6 overflow-x-hidden">
+      <div className="max-w-full lg:max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -91,7 +100,7 @@ export default function PatientDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-6">
-                <Tabs defaultValue="upcoming">
+                <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="grid w-full grid-cols-3 mb-6">
                     <TabsTrigger value="upcoming">Upcoming ({upcomingAppointments.length})</TabsTrigger>
                     <TabsTrigger value="pending">Pending ({pendingAppointments.length})</TabsTrigger>
