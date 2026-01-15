@@ -112,11 +112,10 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
         message: `${patientName} has requested an appointment on ${format(selectedDate, 'MMM dd, yyyy')} at ${selectedSlot.start}`
       });
 
-      onSuccess();
       resetAndClose();
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error("Booking failed:", error);
-    } finally {
       setBooking(false);
     }
   };
