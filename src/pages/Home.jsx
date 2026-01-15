@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { base44 } from "@/api/base44Client";
 import { motion } from "framer-motion";
 import { Calendar, Shield, Bell, BarChart3, Clock, Users, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -113,7 +114,7 @@ export default function Home() {
             >
               <Button 
                 size="lg" 
-                onClick={() => window.location.href = '/auth/register'}
+                onClick={() => base44.auth.redirectToLogin()}
                 className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-8 h-14 text-lg group"
               >
                 Get Started
@@ -122,7 +123,7 @@ export default function Home() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                onClick={() => window.location.href = '/auth/login'}
+                onClick={() => base44.auth.redirectToLogin()}
                 className="border-2 border-slate-300 hover:bg-slate-100 h-14 px-8 text-lg"
               >
                 Sign In
@@ -326,7 +327,7 @@ export default function Home() {
           </p>
           <Button 
             size="lg" 
-            onClick={() => window.location.href = '/auth/register'}
+            onClick={() => base44.auth.redirectToLogin()}
             className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-12 h-14 text-lg"
           >
             Start Free Trial
