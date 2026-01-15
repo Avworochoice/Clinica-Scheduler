@@ -4,6 +4,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
@@ -18,4 +19,5 @@ export const PAGES = {
 export const pagesConfig = {
     mainPage: "Home",
     Pages: PAGES,
+    Layout: __Layout,
 };
