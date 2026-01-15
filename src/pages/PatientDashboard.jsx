@@ -22,7 +22,7 @@ export default function PatientDashboard() {
     if (tab) {
       setActiveTab(tab);
     }
-  }, []);
+  }, [window.location.search]);
 
   useEffect(() => {
     base44.auth.me().then(setUser).catch(() => base44.auth.redirectToLogin());

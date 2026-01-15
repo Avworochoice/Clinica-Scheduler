@@ -30,7 +30,7 @@ export default function AdminDashboard() {
     if (tab) {
       setActiveTab(tab);
     }
-  }, []);
+  }, [window.location.search]);
 
   const { data: users = [], refetch: refetchUsers } = useQuery({
     queryKey: ['all-users'],

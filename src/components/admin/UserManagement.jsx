@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserPlus, Search, Mail, Shield, User, Users, Ban, CheckCircle, Trash2 } from "lucide-react";
+import { UserPlus, Search, Mail, Shield, User, Users, Ban, CheckCircle, Trash2, Stethoscope, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -77,6 +77,37 @@ export default function UserManagement({ users, refetchUsers }) {
     } catch (error) {
       console.error("Failed to delete user:", error);
       alert("Failed to delete user: " + (error.message || "Unknown error"));
+    }
+  };
+
+  const handleAssignDoctor = async () => {
+    if (!selectedDoctor || !assignDoctorDialog) return;
+    
+    setAssigning(true);
+    try {
+      await base44.entities.User.update(assignDoctorDialog.id, {
+        doctor_id: selectedDoctor
+      });
+      if (refetchUsers) refetchUsers();
+      setAssignDoctorDialog(null);
+      setSelectedDoctor("");
+    } catch (error) {
+      console.error("Failed to assign doctor role:", error);
+      alert("Failed to assign doctor role: " + (error.message || "Unknown error"));
+    } finally {
+      setAssigning(false);
+    }
+  };
+
+  const handleRemoveDoctorRole = async (userId) => {
+    try {
+      await base44.entities.User.update(userId, {
+        doctor_id: null
+      });
+      if (refetchUsers) refetchUsers();
+    } catch (error) {
+      console.error("Failed to remove doctor role:", error);
+      alert("Failed to remove doctor role: " + (error.message || "Unknown error"));
     }
   };
 
