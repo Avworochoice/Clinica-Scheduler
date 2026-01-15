@@ -15,14 +15,15 @@ export default function DoctorDashboard() {
   const [user, setUser] = useState(null);
   const [doctor, setDoctor] = useState(null);
   const [activeTab, setActiveTab] = useState("requests");
+  const location = useLocation();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(location.search);
     const tab = urlParams.get('tab');
     if (tab) {
       setActiveTab(tab);
     }
-  }, [window.location.search]);
+  }, [location.search]);
 
   useEffect(() => {
     base44.auth.me().then(async (userData) => {
