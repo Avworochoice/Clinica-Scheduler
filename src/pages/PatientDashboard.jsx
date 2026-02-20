@@ -61,8 +61,13 @@ export default function PatientDashboard() {
     </div>;
   }
 
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 p-4 md:p-6 overflow-x-hidden">
+    <PullToRefreshWrapper onRefresh={handleRefresh}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-cyan-50 dark:from-slate-900 dark:via-blue-900/20 dark:to-cyan-900/20 p-4 md:p-6 overflow-x-hidden">
       <div className="max-w-full lg:max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
@@ -186,5 +191,6 @@ export default function PatientDashboard() {
         onSuccess={refetch}
       />
     </div>
+    </PullToRefreshWrapper>
   );
 }
