@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Shield, Users, Calendar, Activity, FileText, Settings } from "lucide-react";
+import PullToRefreshWrapper from "../components/shared/PullToRefreshWrapper";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminStats from "../components/admin/AdminStats";
 import UserManagement from "../components/admin/UserManagement";
