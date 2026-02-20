@@ -71,15 +71,15 @@ export default function AdminDashboard() {
     initialData: []
   });
 
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([refetchUsers(), refetchDoctors(), refetchAppointments()]);
+  }, [refetchUsers, refetchDoctors, refetchAppointments]);
+
   if (!user) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-pulse text-lg">Loading...</div>
     </div>;
   }
-
-  const handleRefresh = useCallback(async () => {
-    await Promise.all([refetchUsers(), refetchDoctors(), refetchAppointments()]);
-  }, [refetchUsers, refetchDoctors, refetchAppointments]);
 
   return (
     <PullToRefreshWrapper onRefresh={handleRefresh}>
