@@ -77,8 +77,13 @@ export default function AdminDashboard() {
     </div>;
   }
 
+  const handleRefresh = useCallback(async () => {
+    await Promise.all([refetchUsers(), refetchDoctors(), refetchAppointments()]);
+  }, [refetchUsers, refetchDoctors, refetchAppointments]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 p-4 md:p-6 overflow-x-hidden">
+    <PullToRefreshWrapper onRefresh={handleRefresh}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-purple-900/20 dark:to-pink-900/20 p-4 md:p-6 overflow-x-hidden">
       <div className="max-w-full lg:max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
@@ -150,5 +155,6 @@ export default function AdminDashboard() {
         </Tabs>
       </div>
     </div>
+    </PullToRefreshWrapper>
   );
 }
