@@ -52,15 +52,15 @@ export default function DoctorDashboard() {
     return apt.date === today && apt.status === 'approved';
   });
 
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
   if (!user || !doctor) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-pulse text-lg">Loading...</div>
     </div>;
   }
-
-  const handleRefresh = useCallback(async () => {
-    await refetch();
-  }, [refetch]);
 
   return (
     <PullToRefreshWrapper onRefresh={handleRefresh}>

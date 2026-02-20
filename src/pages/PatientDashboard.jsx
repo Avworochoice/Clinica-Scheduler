@@ -55,15 +55,15 @@ export default function PatientDashboard() {
 
   const pendingAppointments = appointments.filter(apt => apt.status === 'pending');
 
+  const handleRefresh = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
   if (!user) {
     return <div className="min-h-screen flex items-center justify-center">
       <div className="animate-pulse text-lg">Loading...</div>
     </div>;
   }
-
-  const handleRefresh = useCallback(async () => {
-    await refetch();
-  }, [refetch]);
 
   return (
     <PullToRefreshWrapper onRefresh={handleRefresh}>
