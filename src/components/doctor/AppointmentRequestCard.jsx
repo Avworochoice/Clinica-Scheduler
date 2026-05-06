@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
@@ -27,12 +27,12 @@ export default function AppointmentRequestCard({ appointment, onUpdate }) {
   const handleApprove = async () => {
     setProcessing(true);
     try {
-      await base44.entities.Appointment.update(appointment.id, {
+      await appClient.entities.Appointment.update(appointment.id, {
         status: "approved",
         notes: notes.trim() || undefined
       });
 
-      await base44.entities.Notification.create({
+      await appClient.entities.Notification.create({
         user_id: appointment.patient_id,
         user_email: appointment.patient_email,
         appointment_id: appointment.id,
@@ -56,12 +56,12 @@ export default function AppointmentRequestCard({ appointment, onUpdate }) {
     
     setProcessing(true);
     try {
-      await base44.entities.Appointment.update(appointment.id, {
+      await appClient.entities.Appointment.update(appointment.id, {
         status: "rejected",
         cancellation_reason: rejectionReason.trim()
       });
 
-      await base44.entities.Notification.create({
+      await appClient.entities.Notification.create({
         user_id: appointment.patient_id,
         user_email: appointment.patient_email,
         appointment_id: appointment.id,

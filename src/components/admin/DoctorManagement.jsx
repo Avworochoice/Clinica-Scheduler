@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -56,7 +56,7 @@ export default function DoctorManagement({ doctors, refetchDoctors }) {
       // Find user by email to get user_id
       let doctorUserId = null;
       if (formData.email) {
-        const users = await base44.entities.User.filter({ email: formData.email });
+        const users = await appClient.entities.User.filter({ email: formData.email });
         if (users && users.length > 0) {
           doctorUserId = users[0].id;
         } else {
@@ -68,9 +68,9 @@ export default function DoctorManagement({ doctors, refetchDoctors }) {
       const dataToSave = { ...formData, user_id: doctorUserId };
 
       if (editing) {
-        await base44.entities.Doctor.update(editing.id, dataToSave);
+        await appClient.entities.Doctor.update(editing.id, dataToSave);
       } else {
-        await base44.entities.Doctor.create(dataToSave);
+        await appClient.entities.Doctor.create(dataToSave);
       }
       refetchDoctors();
       resetForm();
@@ -125,7 +125,7 @@ export default function DoctorManagement({ doctors, refetchDoctors }) {
 
   const handleDelete = async (doctorId) => {
     try {
-      await base44.entities.Doctor.delete(doctorId);
+      await appClient.entities.Doctor.delete(doctorId);
       refetchDoctors();
       setDeleteConfirm(null);
     } catch (error) {

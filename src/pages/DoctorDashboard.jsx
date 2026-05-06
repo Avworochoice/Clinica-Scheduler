@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Calendar, Clock, Users, TrendingUp, CheckCircle, XCircle } from "lucide-react";
@@ -27,18 +27,18 @@ export default function DoctorDashboard() {
   }, [location.search]);
 
   useEffect(() => {
-    base44.auth.me().then(async (userData) => {
+    appClient.auth.me().then(async (userData) => {
       setUser(userData);
       if (userData.doctor_id) {
-        const doctorData = await base44.entities.Doctor.filter({ id: userData.doctor_id });
+        const doctorData = await appClient.entities.Doctor.filter({ id: userData.doctor_id });
         setDoctor(doctorData[0]);
       }
-    }).catch(() => base44.auth.redirectToLogin());
+    }).catch(() => appClient.auth.redirectToLogin());
   }, []);
 
   const { data: appointments = [], refetch } = useQuery({
     queryKey: ['doctor-appointments', doctor?.id],
-    queryFn: () => base44.entities.Appointment.filter({ doctor_id: doctor.id }, '-created_date'),
+    queryFn: () => appClient.entities.Appointment.filter({ doctor_id: doctor.id }, '-created_date'),
     enabled: !!doctor,
     initialData: []
   });

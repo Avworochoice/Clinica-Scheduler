@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { format, addDays, startOfWeek, isBefore, startOfDay } from "date-fns";
@@ -28,7 +28,7 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
 
   const { data: doctors = [] } = useQuery({
     queryKey: ['doctors'],
-    queryFn: () => base44.entities.Doctor.filter({ is_active: true }),
+    queryFn: () => appClient.entities.Doctor.filter({ is_active: true }),
     initialData: []
   });
 
@@ -67,7 +67,7 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
 
   const { data: existingAppointments = [] } = useQuery({
     queryKey: ['doctor-appointments', selectedDoctor?.id, selectedDate],
-    queryFn: () => base44.entities.Appointment.filter({
+    queryFn: () => appClient.entities.Appointment.filter({
       doctor_id: selectedDoctor.id,
       date: format(selectedDate, 'yyyy-MM-dd')
     }),
@@ -91,7 +91,7 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
     setBooking(true);
     setError(null);
     try {
-      const appointment = await base44.entities.Appointment.create({
+      const appointment = await appClient.entities.Appointment.create({
         patient_id: patientId,
         patient_name: patientName,
         patient_email: patientEmail,
@@ -105,7 +105,7 @@ export default function BookAppointmentDialog({ open, onClose, patientId, patien
       });
 
       // Create notification for doctor
-      await base44.entities.Notification.create({
+      await appClient.entities.Notification.create({
         user_id: selectedDoctor.user_id,
         user_email: selectedDoctor.email,
         appointment_id: appointment.id,

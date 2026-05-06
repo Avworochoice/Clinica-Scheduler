@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,7 +50,7 @@ export default function UserManagement({ users, refetchUsers }) {
 
   const { data: doctors = [] } = useQuery({
     queryKey: ['doctors-list'],
-    queryFn: () => base44.entities.Doctor.list('-created_date'),
+    queryFn: () => appClient.entities.Doctor.list('-created_date'),
     initialData: []
   });
 
@@ -64,7 +64,7 @@ export default function UserManagement({ users, refetchUsers }) {
     
     setInviting(true);
     try {
-      await base44.users.inviteUser(inviteEmail, inviteRole);
+      await appClient.users.inviteUser(inviteEmail, inviteRole);
       if (refetchUsers) refetchUsers();
       setShowInvite(false);
       setInviteEmail("");
@@ -78,7 +78,7 @@ export default function UserManagement({ users, refetchUsers }) {
 
   const handleToggleStatus = async (userId, currentStatus) => {
     try {
-      await base44.entities.User.update(userId, {
+      await appClient.entities.User.update(userId, {
         is_active: !currentStatus
       });
       if (refetchUsers) refetchUsers();
@@ -89,7 +89,7 @@ export default function UserManagement({ users, refetchUsers }) {
 
   const handleDelete = async (userId) => {
     try {
-      await base44.entities.User.delete(userId);
+      await appClient.entities.User.delete(userId);
       if (refetchUsers) refetchUsers();
       setDeleteConfirm(null);
     } catch (error) {
@@ -103,7 +103,7 @@ export default function UserManagement({ users, refetchUsers }) {
     
     setAssigning(true);
     try {
-      await base44.entities.User.update(assignDoctorDialog.id, {
+      await appClient.entities.User.update(assignDoctorDialog.id, {
         doctor_id: selectedDoctor
       });
       if (refetchUsers) refetchUsers();
@@ -119,7 +119,7 @@ export default function UserManagement({ users, refetchUsers }) {
 
   const handleRemoveDoctorRole = async (userId) => {
     try {
-      await base44.entities.User.update(userId, {
+      await appClient.entities.User.update(userId, {
         doctor_id: null
       });
       if (refetchUsers) refetchUsers();

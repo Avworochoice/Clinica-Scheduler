@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import {
   Calendar,
@@ -61,9 +61,9 @@ export default function Layout({ children, currentPageName }) {
   }, []);
 
   useEffect(() => {
-    base44.auth.isAuthenticated().then((isAuth) => {
+    appClient.auth.isAuthenticated().then((isAuth) => {
       if (isAuth) {
-        base44.auth.me().then((userData) => {
+        appClient.auth.me().then((userData) => {
           setUser(userData);
           // Apply saved dark mode pref from user settings too
           if (userData.settings?.darkMode !== undefined) {
@@ -83,17 +83,8 @@ export default function Layout({ children, currentPageName }) {
     setCurrentTab(urlParams.get("tab") || "");
   }, [location.search]);
 
-  const handleLogout = async () => {
-    try {
-      const userData = await base44.auth.me();
-      await base44.entities.AuditLog.create({
-        user_id: userData.id,
-        user_email: userData.email,
-        user_role: userData.role,
-        action: "user_logout"
-      });
-    } catch (error) {}
-    base44.auth.logout();
+  const handleLogout = () => {
+    appClient.auth.logout();
   };
 
   const publicPages = ["Home", "Register", "ForgotPassword"];

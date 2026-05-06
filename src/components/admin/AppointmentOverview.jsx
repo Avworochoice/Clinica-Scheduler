@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 
 export default function AppointmentOverview({ appointments, doctors, refetchAppointments }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,10 +68,10 @@ export default function AppointmentOverview({ appointments, doctors, refetchAppo
       }
 
       // Find user by email to get patient_id
-      const users = await base44.entities.User.filter({ email: newAppointmentData.patient_email });
+      const users = await appClient.entities.User.filter({ email: newAppointmentData.patient_email });
       const patientId = users && users.length > 0 ? users[0].id : "admin-created-patient";
 
-      await base44.entities.Appointment.create({
+      await appClient.entities.Appointment.create({
         patient_id: patientId,
         patient_name: newAppointmentData.patient_name,
         patient_email: newAppointmentData.patient_email,
@@ -108,7 +108,7 @@ export default function AppointmentOverview({ appointments, doctors, refetchAppo
 
   const handleDelete = async (appointmentId) => {
     try {
-      await base44.entities.Appointment.delete(appointmentId);
+      await appClient.entities.Appointment.delete(appointmentId);
       refetchAppointments();
       setDeleteConfirm(null);
     } catch (error) {

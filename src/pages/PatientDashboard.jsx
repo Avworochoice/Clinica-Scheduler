@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Calendar, Clock, User, Bell, Plus } from "lucide-react";
@@ -28,19 +28,19 @@ export default function PatientDashboard() {
   }, [location.search]);
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => base44.auth.redirectToLogin());
+    appClient.auth.me().then(setUser).catch(() => appClient.auth.redirectToLogin());
   }, []);
 
   const { data: appointments = [], isLoading, refetch } = useQuery({
     queryKey: ['appointments', user?.id],
-    queryFn: () => base44.entities.Appointment.filter({ patient_id: user.id }, '-created_date'),
+    queryFn: () => appClient.entities.Appointment.filter({ patient_id: user.id }, '-created_date'),
     enabled: !!user,
     initialData: []
   });
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications', user?.id],
-    queryFn: () => base44.entities.Notification.filter({ user_id: user.id }, '-created_date', 10),
+    queryFn: () => appClient.entities.Notification.filter({ user_id: user.id }, '-created_date', 10),
     enabled: !!user,
     initialData: []
   });

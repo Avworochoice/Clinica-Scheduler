@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { Shield, Users, Calendar, Activity, FileText, Settings } from "lucide-react";
@@ -19,12 +19,12 @@ export default function AdminDashboard() {
   const location = useLocation();
 
   useEffect(() => {
-    base44.auth.me().then((userData) => {
+    appClient.auth.me().then((userData) => {
       if (userData.role !== 'admin') {
         window.location.href = '/';
       }
       setUser(userData);
-    }).catch(() => base44.auth.redirectToLogin());
+    }).catch(() => appClient.auth.redirectToLogin());
   }, []);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function AdminDashboard() {
   const { data: users = [], refetch: refetchUsers } = useQuery({
     queryKey: ['all-users'],
     queryFn: async () => {
-      const data = await base44.entities.User.list('-created_date');
+      const data = await appClient.entities.User.list('-created_date');
       // Deduplicate by id
       const uniqueUsers = Array.from(new Map(data.map(item => [item.id, item])).values());
       return uniqueUsers;
@@ -50,7 +50,7 @@ export default function AdminDashboard() {
   const { data: doctors = [], refetch: refetchDoctors } = useQuery({
     queryKey: ['all-doctors'],
     queryFn: async () => {
-      const data = await base44.entities.Doctor.list('-created_date');
+      const data = await appClient.entities.Doctor.list('-created_date');
       // Deduplicate by id
       const uniqueDoctors = Array.from(new Map(data.map(item => [item.id, item])).values());
       return uniqueDoctors;
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
   const { data: appointments = [], refetch: refetchAppointments } = useQuery({
     queryKey: ['all-appointments'],
     queryFn: async () => {
-      const data = await base44.entities.Appointment.list('-created_date');
+      const data = await appClient.entities.Appointment.list('-created_date');
       // Deduplicate by id
       const uniqueAppointments = Array.from(new Map(data.map(item => [item.id, item])).values());
       return uniqueAppointments;

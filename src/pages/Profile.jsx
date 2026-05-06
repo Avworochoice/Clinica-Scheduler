@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,28 +20,28 @@ export default function Profile() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    base44.auth.me().then((userData) => {
+    appClient.auth.me().then((userData) => {
       setUser(userData);
       setFormData({
         full_name: userData.full_name || "",
         email: userData.email || ""
       });
-    }).catch(() => base44.auth.redirectToLogin());
+    }).catch(() => appClient.auth.redirectToLogin());
   }, []);
 
   const { data: doctor } = useQuery({
     queryKey: ['doctor-profile', user?.doctor_id],
-    queryFn: () => base44.entities.Doctor.filter({ id: user.doctor_id }),
+    queryFn: () => appClient.entities.Doctor.filter({ id: user.doctor_id }),
     enabled: !!user?.doctor_id,
     select: (data) => data[0]
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe(data),
+    mutationFn: (data) => appClient.auth.updateMe(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       setEditing(false);
-      base44.auth.me().then(setUser);
+      appClient.auth.me().then(setUser);
     }
   });
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ export default function AuditLogs() {
 
   const { data: logs = [] } = useQuery({
     queryKey: ['audit-logs'],
-    queryFn: () => base44.entities.AuditLog.list('-created_date', 100),
+    queryFn: () => appClient.entities.AuditLog.list('-created_date', 100),
     initialData: []
   });
 

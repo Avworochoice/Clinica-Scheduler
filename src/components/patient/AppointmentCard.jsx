@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Card } from "@/components/ui/card";
@@ -32,13 +32,13 @@ export default function AppointmentCard({ appointment, onUpdate, isPast = false 
   const handleCancel = async () => {
     setCancelling(true);
     try {
-      await base44.entities.Appointment.update(appointment.id, {
+      await appClient.entities.Appointment.update(appointment.id, {
         status: "cancelled",
         cancellation_reason: "Cancelled by patient"
       });
 
       // Create notification for doctor
-      await base44.entities.Notification.create({
+      await appClient.entities.Notification.create({
         user_id: appointment.doctor_id,
         user_email: appointment.doctor_email || "",
         appointment_id: appointment.id,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -31,7 +31,7 @@ export default function Settings() {
   const [deletingAccount, setDeletingAccount] = useState(false);
 
   useEffect(() => {
-    base44.auth
+    appClient.auth
       .me()
       .then((userData) => {
         setUser(userData);
@@ -39,7 +39,7 @@ export default function Settings() {
           setSettings(userData.settings);
         }
       })
-      .catch(() => base44.auth.redirectToLogin());
+      .catch(() => appClient.auth.redirectToLogin());
   }, []);
 
   const handleToggle = async (key) => {
@@ -53,14 +53,14 @@ export default function Settings() {
       document.documentElement.classList.toggle("dark", val);
     }
 
-    await base44.auth.updateMe({ settings: newSettings });
+    await appClient.auth.updateMe({ settings: newSettings });
   };
 
   const handleDeleteAccount = async () => {
     setDeletingAccount(true);
     try {
       // Log the action before deletion
-      await base44.entities.AuditLog.create({
+      await appClient.entities.AuditLog.create({
         user_id: user.id,
         user_email: user.email,
         user_role: user.role,
@@ -69,8 +69,8 @@ export default function Settings() {
       });
     } catch (_) {}
     // Deactivate the user account
-    await base44.auth.updateMe({ is_active: false, deleted_at: new Date().toISOString() });
-    base44.auth.logout();
+    await appClient.auth.updateMe({ is_active: false, deleted_at: new Date().toISOString() });
+    appClient.auth.logout();
   };
 
   if (!user) {

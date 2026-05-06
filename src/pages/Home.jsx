@@ -1,31 +1,46 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { appClient } from "@/api/appClient";
 import { motion } from "framer-motion";
 import { Calendar, Shield, Bell, BarChart3, Clock, Users, CheckCircle2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function Home() {
   const [currentWord, setCurrentWord] = useState(0);
+  const [accounts, setAccounts] = useState([]);
+  const [showLocalAccess, setShowLocalAccess] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const words = ["Efficient", "Secure", "Modern", "Smart"];
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirectToDashboard = (user) => {
+    if (user.role === 'admin') {
+      navigate(createPageUrl('AdminDashboard'));
+    } else if (user.doctor_id) {
+      navigate(createPageUrl('DoctorDashboard'));
+    } else {
+      navigate(createPageUrl('PatientDashboard'));
+    }
+  };
 
   useEffect(() => {
-    // Check if user is authenticated and redirect to appropriate dashboard
-    base44.auth.isAuthenticated().then(isAuth => {
+    setShowLocalAccess(new URLSearchParams(location.search).get('login') === '1');
+
+    appClient.entities.User.list('-created_date').then((users) => {
+      setAccounts(users.filter((user) => user.is_active !== false && !user.deleted_at));
+    });
+
+    appClient.auth.isAuthenticated().then(isAuth => {
       if (isAuth) {
-        base44.auth.me().then(user => {
-          if (user.role === 'admin') {
-            window.location.href = createPageUrl('AdminDashboard');
-          } else if (user.doctor_id) {
-            window.location.href = createPageUrl('DoctorDashboard');
-          } else {
-            window.location.href = createPageUrl('PatientDashboard');
-          }
+        appClient.auth.me().then(user => {
+          redirectToDashboard(user);
         }).catch(() => {});
       }
     });
-  }, []);
+  }, [location.search]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -33,6 +48,24 @@ export default function Home() {
     }, 2500);
     return () => clearInterval(interval);
   }, []);
+
+  const handleLocalLogin = async (email) => {
+    setLoginError("");
+
+    try {
+      const user = await appClient.auth.login(email);
+      const redirectUrl = appClient.auth.consumeRedirectUrl();
+
+      if (redirectUrl) {
+        window.location.assign(redirectUrl);
+        return;
+      }
+
+      redirectToDashboard(user);
+    } catch (error) {
+      setLoginError(error.message || 'Unable to sign in with the selected local account.');
+    }
+  };
 
   const features = [
     {
@@ -131,7 +164,7 @@ export default function Home() {
             >
               <Button 
                 size="lg" 
-                onClick={() => base44.auth.redirectToLogin()}
+                onClick={() => setShowLocalAccess(true)}
                 className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-8 h-14 text-lg group"
               >
                 Get Started
@@ -140,12 +173,66 @@ export default function Home() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                onClick={() => base44.auth.redirectToLogin()}
+                onClick={() => setShowLocalAccess(true)}
                 className="border-2 border-slate-300 hover:bg-slate-100 h-14 px-8 text-lg"
               >
                 Sign In
               </Button>
             </motion.div>
+
+            {showLocalAccess && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="mt-10 mx-auto max-w-5xl rounded-3xl border border-white/60 bg-white/85 p-6 shadow-2xl backdrop-blur"
+              >
+                <div className="flex flex-col gap-3 text-left sm:text-center">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600">Local Access</p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-900">Run the app without a hosted backend</h2>
+                  <p className="text-slate-600">
+                    Choose one of the browser-stored accounts below. All data stays in this browser so you can run,
+                    update, and manage the app locally.
+                  </p>
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-3">
+                  {accounts.map((account) => (
+                    <button
+                      key={account.id}
+                      type="button"
+                      onClick={() => handleLocalLogin(account.email)}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left transition hover:-translate-y-1 hover:border-blue-300 hover:bg-white hover:shadow-lg"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-lg font-semibold text-slate-900">{account.full_name}</p>
+                          <p className="mt-1 text-sm text-slate-500">{account.email}</p>
+                        </div>
+                        <Badge variant={account.role === 'admin' ? 'default' : 'secondary'}>
+                          {account.role === 'admin'
+                            ? 'Admin'
+                            : account.doctor_id
+                              ? 'Doctor'
+                              : 'Patient'}
+                        </Badge>
+                      </div>
+                      <p className="mt-4 text-sm text-slate-600">
+                        {account.role === 'admin'
+                          ? 'Open the admin workspace and manage users, doctors, analytics, and audit logs.'
+                          : account.doctor_id
+                            ? 'Open the doctor workspace to review requests, manage your schedule, and approve visits.'
+                            : 'Open the patient workspace to book appointments and manage notifications.'}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+
+                {loginError ? (
+                  <p className="mt-4 text-sm font-medium text-red-600">{loginError}</p>
+                ) : null}
+              </motion.div>
+            )}
 
             <motion.div
               initial={{ opacity: 0 }}
@@ -344,7 +431,7 @@ export default function Home() {
           </p>
           <Button 
             size="lg" 
-            onClick={() => base44.auth.redirectToLogin()}
+            onClick={() => setShowLocalAccess(true)}
             className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white shadow-lg shadow-blue-500/30 px-12 h-14 text-lg"
           >
             Start Free Trial
